@@ -1,4 +1,4 @@
-package ejercicios_tt
+package main
 
 import "fmt"
 

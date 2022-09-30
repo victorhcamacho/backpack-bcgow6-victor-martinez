@@ -1,4 +1,4 @@
-package ejercicios_tt
+package main
 
 type User struct {
 	name     string
