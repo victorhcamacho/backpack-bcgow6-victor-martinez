@@ -1,0 +1,32 @@
+[
+    {
+        "Id": 1,
+        "Name": "Mackbook Pro 13 pulgadas",
+        "UnitPrice": 199.99,
+        "Stock": 10,
+        "Color": "Gris espacial",
+        "UnitCode": "MAC-0001-001",
+        "Published": true,
+        "CreationDate": "03/10/2022"
+    },
+    {
+        "Id": 2,
+        "Name": "Mackbook Air 13 pulgadas",
+        "UnitPrice": 99.99,
+        "Stock": 20,
+        "Color": "Plata",
+        "UnitCode": "MAC-0010-001",
+        "Published": true,
+        "CreationDate": "03/10/2022"
+    },
+    {
+        "Id": 3,
+        "Name": "Microsoft Surface 15 pulgadas",
+        "UnitPrice": 149.99,
+        "Stock": 10,
+        "Color": "Negro metalico",
+        "UnitCode": "SURF-0001-001",
+        "Published": false,
+        "CreationDate": "03/10/2022"
+    }
+]
