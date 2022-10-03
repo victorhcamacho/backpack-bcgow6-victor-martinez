@@ -1,10 +1,11 @@
 package main
 
 import (
-	"backpack-bcgow6-victor-martinez/GoBasesPracticasC2/ejercicios_tt"
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/victorhcamacho/backpack-bcgow6-victor-martinez/GoBasesPracticasC2/ejercicios_tt"
 )
 
 func ejercicio1() {

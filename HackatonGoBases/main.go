@@ -1,8 +1,9 @@
 package main
 
 import (
-	"backpack-bcgow6-victor-martinez/HackatonGoBases/structs"
 	"fmt"
+
+	"github.com/victorhcamacho/backpack-bcgow6-victor-martinez/HackatonGoBases/structs"
 )
 
 const FILE_PATH string = "./tickets.csv"

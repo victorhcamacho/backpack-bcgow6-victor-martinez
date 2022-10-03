@@ -1,9 +1,10 @@
 package main
 
 import (
-	"backpack-bcgow6-victor-martinez/GoBasesPracticasC1/ejercicios_tm"
-	"backpack-bcgow6-victor-martinez/GoBasesPracticasC1/ejercicios_tt"
 	"fmt"
+
+	"github.com/victorhcamacho/backpack-bcgow6-victor-martinez/GoBasesPracticasC1/ejercicios_tm"
+	"github.com/victorhcamacho/backpack-bcgow6-victor-martinez/GoBasesPracticasC1/ejercicios_tt"
 )
 
 func ejecutarEjerciciosMañana() {
