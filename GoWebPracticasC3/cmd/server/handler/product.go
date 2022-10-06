@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/victorhcamacho/backpack-bcgow6-victor-martinez/GoWebPracticasC3/internal/products"
+	"github.com/victorhcamacho/backpack-bcgow6-victor-martinez/GoWebPracticasC3/pkg/web"
 )
 
 type requestDTO struct {
@@ -32,25 +33,27 @@ func (ph *productHandler) GetAll() gin.HandlerFunc {
 		tokenHeader := ctx.GetHeader("token")
 
 		if len(tokenHeader) == 0 {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"authError": "Es necesario enviar el cabecero 'token' para verificar la petición",
-			})
+			ctx.JSON(
+				http.StatusBadRequest,
+				web.NewResponse(400, nil, "Es necesario enviar el cabecero 'token' para verificar la petición"),
+			)
 			return
 		} else if tokenHeader != os.Getenv("TOKEN_AUTH") {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"authError": "No cuenta con los permisos necesarios para procesar la petición solicitada",
-			})
+			ctx.JSON(
+				http.StatusUnauthorized,
+				web.NewResponse(401, nil, "No cuenta con los permisos necesarios para procesar la petición solicitada"),
+			)
 			return
 		}
 
 		products, err := ph.service.GetAll()
 
 		if err != nil {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusNotFound, web.NewResponse(404, nil, err.Error()))
 			return
 		}
 
-		ctx.JSON(http.StatusOK, products)
+		ctx.JSON(http.StatusOK, web.NewResponse(200, products, ""))
 	}
 }
 
@@ -60,32 +63,34 @@ func (ph *productHandler) GetByID() gin.HandlerFunc {
 		tokenHeader := ctx.GetHeader("token")
 
 		if len(tokenHeader) == 0 {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"authError": "Es necesario enviar el cabecero 'token' para verificar la petición",
-			})
+			ctx.JSON(
+				http.StatusBadRequest,
+				web.NewResponse(400, nil, "Es necesario enviar el cabecero 'token' para verificar la petición"),
+			)
 			return
 		} else if tokenHeader != os.Getenv("TOKEN_AUTH") {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"authError": "No cuenta con los permisos necesarios para procesar la petición solicitada",
-			})
+			ctx.JSON(
+				http.StatusUnauthorized,
+				web.NewResponse(401, nil, "No cuenta con los permisos necesarios para procesar la petición solicitada"),
+			)
 			return
 		}
 
 		idProduct, err := strconv.Atoi(ctx.Param("id"))
 
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "No fue posible obtener el id del producto"})
+			ctx.JSON(http.StatusBadRequest, web.NewResponse(400, nil, "No fue posible obtener el id del producto"))
 			return
 		}
 
 		product, err := ph.service.GetByID(idProduct)
 
 		if err != nil {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusNotFound, web.NewResponse(404, nil, err.Error()))
 			return
 		}
 
-		ctx.JSON(http.StatusOK, product)
+		ctx.JSON(http.StatusOK, web.NewResponse(200, product, ""))
 	}
 }
 
@@ -95,39 +100,41 @@ func (ph *productHandler) Save() gin.HandlerFunc {
 		tokenHeader := ctx.GetHeader("token")
 
 		if len(tokenHeader) == 0 {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"authError": "Es necesario enviar el cabecero 'token' para verificar la petición",
-			})
+			ctx.JSON(
+				http.StatusBadRequest,
+				web.NewResponse(400, nil, "Es necesario enviar el cabecero 'token' para verificar la petición"),
+			)
 			return
 		} else if tokenHeader != os.Getenv("TOKEN_AUTH") {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"authError": "No cuenta con los permisos necesarios para procesar la petición solicitada",
-			})
+			ctx.JSON(
+				http.StatusUnauthorized,
+				web.NewResponse(401, nil, "No cuenta con los permisos necesarios para procesar la petición solicitada"),
+			)
 			return
 		}
 
 		var request requestDTO
 
 		if err := ctx.ShouldBindJSON(&request); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"parseError": err.Error()})
+			ctx.JSON(http.StatusBadRequest, web.NewResponse(400, nil, err.Error()))
 			return
 		}
 
-		errorList := validateRequest(&request)
+		errorParam := validateRequest(&request)
 
-		if len(errorList) > 0 {
-			ctx.JSON(http.StatusBadRequest, gin.H{"validationErrors": errorList})
+		if errorParam != "" {
+			ctx.JSON(http.StatusBadRequest, web.NewResponse(400, nil, errorParam))
 			return
 		}
 
 		product, err := ph.service.Save(request.Name, request.UnitPrice, request.StockQuantity)
 
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"saveError": err.Error()})
+			ctx.JSON(http.StatusInternalServerError, web.NewResponse(500, nil, err.Error()))
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, product)
+		ctx.JSON(http.StatusCreated, web.NewResponse(201, product, ""))
 
 	}
 }
@@ -138,46 +145,51 @@ func (ph *productHandler) Update() gin.HandlerFunc {
 		tokenHeader := ctx.GetHeader("token")
 
 		if len(tokenHeader) == 0 {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"authError": "Es necesario enviar el cabecero 'token' para verificar la petición",
-			})
+			ctx.JSON(
+				http.StatusBadRequest,
+				web.NewResponse(400, nil, "Es necesario enviar el cabecero 'token' para verificar la petición"),
+			)
 			return
 		} else if tokenHeader != os.Getenv("TOKEN_AUTH") {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"authError": "No cuenta con los permisos necesarios para procesar la petición solicitada",
-			})
+			ctx.JSON(
+				http.StatusUnauthorized,
+				web.NewResponse(401, nil, "No cuenta con los permisos necesarios para procesar la petición solicitada"),
+			)
 			return
 		}
 
 		idProduct, err := strconv.Atoi(ctx.Param("id"))
 
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "No fue posible obtener el id del producto"})
+			ctx.JSON(
+				http.StatusBadRequest,
+				web.NewResponse(400, nil, "No fue posible obtener el id del producto"),
+			)
 			return
 		}
 
 		var request requestDTO
 
 		if err := ctx.ShouldBindJSON(&request); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"parseError": err.Error()})
+			ctx.JSON(http.StatusBadRequest, web.NewResponse(400, nil, err.Error()))
 			return
 		}
 
-		errorList := validateRequest(&request)
+		errorParam := validateRequest(&request)
 
-		if len(errorList) > 0 {
-			ctx.JSON(http.StatusBadRequest, gin.H{"validationErrors": errorList})
+		if errorParam != "" {
+			ctx.JSON(http.StatusBadRequest, web.NewResponse(400, nil, errorParam))
 			return
 		}
 
 		product, err := ph.service.Update(idProduct, request.Name, request.UnitPrice, request.StockQuantity)
 
 		if err != nil {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusNotFound, web.NewResponse(404, nil, err.Error()))
 			return
 		}
 
-		ctx.JSON(http.StatusOK, product)
+		ctx.JSON(http.StatusOK, web.NewResponse(200, product, ""))
 	}
 }
 
@@ -187,47 +199,58 @@ func (ph *productHandler) UpdatePatch() gin.HandlerFunc {
 		tokenHeader := ctx.GetHeader("token")
 
 		if len(tokenHeader) == 0 {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"authError": "Es necesario enviar el cabecero 'token' para verificar la petición",
-			})
+			ctx.JSON(
+				http.StatusBadRequest,
+				web.NewResponse(400, nil, "Es necesario enviar el cabecero 'token' para verificar la petición"),
+			)
 			return
 		} else if tokenHeader != os.Getenv("TOKEN_AUTH") {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"authError": "No cuenta con los permisos necesarios para procesar la petición solicitada",
-			})
+			ctx.JSON(
+				http.StatusUnauthorized,
+				web.NewResponse(401, nil, "No cuenta con los permisos necesarios para procesar la petición solicitada"),
+			)
 			return
 		}
 
 		idProduct, err := strconv.Atoi(ctx.Param("id"))
 
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "No fue posible obtener el id del producto"})
+			ctx.JSON(
+				http.StatusBadRequest,
+				web.NewResponse(400, nil, "No fue posible obtener el id del producto"),
+			)
 			return
 		}
 
 		var request requestDTO
 
 		if err := ctx.ShouldBindJSON(&request); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"parseError": err.Error()})
+			ctx.JSON(http.StatusBadRequest, web.NewResponse(400, nil, err.Error()))
 			return
 		}
 
 		if request.Name == "" {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "El nombre del producto es requerido"})
+			ctx.JSON(
+				http.StatusBadRequest,
+				web.NewResponse(400, nil, "El nombre del producto es requerido"),
+			)
 			return
 		} else if request.UnitPrice <= 0 {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "El precio unitario del producto es requerido"})
+			ctx.JSON(
+				http.StatusBadRequest,
+				web.NewResponse(400, nil, "El precio unitario del producto es requerido"),
+			)
 			return
 		}
 
 		product, err := ph.service.UpdateNameAndPrice(idProduct, request.Name, request.UnitPrice)
 
 		if err != nil {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusNotFound, web.NewResponse(404, nil, err.Error()))
 			return
 		}
 
-		ctx.JSON(http.StatusOK, product)
+		ctx.JSON(http.StatusOK, web.NewResponse(200, product, ""))
 	}
 }
 
@@ -237,36 +260,41 @@ func (ph *productHandler) Delete() gin.HandlerFunc {
 		tokenHeader := ctx.GetHeader("token")
 
 		if len(tokenHeader) == 0 {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"authError": "Es necesario enviar el cabecero 'token' para verificar la petición",
-			})
+			ctx.JSON(
+				http.StatusBadRequest,
+				web.NewResponse(400, nil, "Es necesario enviar el cabecero 'token' para verificar la petición"),
+			)
 			return
 		} else if tokenHeader != os.Getenv("TOKEN_AUTH") {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"authError": "No cuenta con los permisos necesarios para procesar la petición solicitada",
-			})
+			ctx.JSON(
+				http.StatusUnauthorized,
+				web.NewResponse(401, nil, "No cuenta con los permisos necesarios para procesar la petición solicitada"),
+			)
 			return
 		}
 
 		idProduct, err := strconv.Atoi(ctx.Param("id"))
 
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "No fue posible obtener el id del producto"})
+			ctx.JSON(
+				http.StatusBadRequest,
+				web.NewResponse(400, nil, "No fue posible obtener el id del producto"),
+			)
 			return
 		}
 
 		errDel := ph.service.Delete(idProduct)
 
 		if errDel != nil {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": errDel.Error()})
+			ctx.JSON(http.StatusNotFound, web.NewResponse(404, nil, errDel.Error()))
 			return
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{"result": fmt.Sprintf("El producto %d ha sido eliminado", idProduct)})
+		ctx.JSON(http.StatusOK, web.NewResponse(200, fmt.Sprintf("El producto %d ha sido eliminado", idProduct), ""))
 	}
 }
 
-func validateRequest(req *requestDTO) (errors []string) {
+func validateRequest(req *requestDTO) (strError string) {
 
 	validate := validator.New()
 
@@ -274,7 +302,7 @@ func validateRequest(req *requestDTO) (errors []string) {
 
 	if err != nil {
 
-		var strError string
+		// var strError string
 
 		for _, verr := range err.(validator.ValidationErrors) {
 
@@ -284,11 +312,13 @@ func validateRequest(req *requestDTO) (errors []string) {
 			switch tag {
 			case "required":
 				strError = fmt.Sprintf("El parametro %s es requerido", param)
+				return
 			case "min":
 				strError = fmt.Sprintf("El valor del parametro %s debe ser mayor a 0", param)
+				return
 			}
 
-			errors = append(errors, strError)
+			// errors = append(errors, strError)
 		}
 	}
 

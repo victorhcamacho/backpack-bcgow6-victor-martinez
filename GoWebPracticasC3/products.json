@@ -4,5 +4,11 @@
     "nombre": "Frijoles 1Kg",
     "precioUnitario": 100,
     "cantidadExistencias": 10
+  },
+  {
+    "id": 2,
+    "nombre": "Cafe Americano 1Kg",
+    "precioUnitario": 55.5,
+    "cantidadExistencias": 100
   }
 ]
