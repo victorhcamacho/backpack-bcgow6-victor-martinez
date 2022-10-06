@@ -13,7 +13,6 @@ import (
 )
 
 type requestDTO struct {
-	ID            int     `json:"id"`
 	Name          string  `json:"nombre" validate:"required"`
 	UnitPrice     float64 `json:"precioUnitario" validate:"required,min=1"`
 	StockQuantity int     `json:"cantidadExistencias" validate:"required,min=1"`
@@ -27,6 +26,18 @@ func NewProduct(s products.Service) *productHandler {
 	return &productHandler{service: s}
 }
 
+// List All Products
+// @Summary List products
+// @Tags Products
+// @Description get all products
+// @Produce  json
+// @Param token header string true "Access Token"
+// @Success  200    {object}  web.Response  "Success"
+// @Failure  400    {object}  web.Response  "Bad Request"
+// @Failure  401    {object}  web.Response  "Unauthorized"
+// @Failure  404    {object}  web.Response  "Not Found"
+// @Failure  500    {object}  web.Response  "Internal Server Error"
+// @Router /products/ [GET]
 func (ph *productHandler) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
@@ -57,6 +68,19 @@ func (ph *productHandler) GetAll() gin.HandlerFunc {
 	}
 }
 
+// List One Product
+// @Summary List a product
+// @Tags Products
+// @Description get only one product
+// @Produce  json
+// @Param token header string true "Access Token"
+// @Param    id       path      int             true   "ID Product"
+// @Success  200    {object}  web.Response  "Success"
+// @Failure  400    {object}  web.Response  "Bad Request"
+// @Failure  401    {object}  web.Response  "Unauthorized"
+// @Failure  404    {object}  web.Response  "Not Found"
+// @Failure  500    {object}  web.Response  "Internal Server Error"
+// @Router /products/{id} [GET]
 func (ph *productHandler) GetByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
@@ -94,6 +118,20 @@ func (ph *productHandler) GetByID() gin.HandlerFunc {
 	}
 }
 
+// Store Product
+// @Summary Store a product
+// @Tags Products
+// @Description create a new product
+// @Accept   json
+// @Produce  json
+// @Param token header string true "Access Token"
+// @Param    product  body    requestDTO	true	"Product to Store"
+// @Success  201    {object}  web.Response  "Success"
+// @Failure  400    {object}  web.Response  "Bad Request"
+// @Failure  401    {object}  web.Response  "Unauthorized"
+// @Failure  404    {object}  web.Response  "Not Found"
+// @Failure  500    {object}  web.Response  "Internal Server Error"
+// @Router /products/ [POST]
 func (ph *productHandler) Save() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
@@ -120,7 +158,7 @@ func (ph *productHandler) Save() gin.HandlerFunc {
 			return
 		}
 
-		errorParam := validateRequest(&request)
+		errorParam := validateRequest(request)
 
 		if errorParam != "" {
 			ctx.JSON(http.StatusBadRequest, web.NewResponse(400, nil, errorParam))
@@ -139,6 +177,21 @@ func (ph *productHandler) Save() gin.HandlerFunc {
 	}
 }
 
+// Update Product
+// @Summary Update a product
+// @Tags Products
+// @Description update an existing product
+// @Accept   json
+// @Produce  json
+// @Param token header string true "Access Token"
+// @Param    id       path      int         true   "ID Product"
+// @Param    product  body      requestDTO  true  "Product to Update"
+// @Success  200    {object}  web.Response  "Success"
+// @Failure  400    {object}  web.Response  "Bad Request"
+// @Failure  401    {object}  web.Response  "Unauthorized"
+// @Failure  404    {object}  web.Response  "Not Found"
+// @Failure  500    {object}  web.Response  "Internal Server Error"
+// @Router /products/{id} [PUT]
 func (ph *productHandler) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
@@ -175,7 +228,7 @@ func (ph *productHandler) Update() gin.HandlerFunc {
 			return
 		}
 
-		errorParam := validateRequest(&request)
+		errorParam := validateRequest(request)
 
 		if errorParam != "" {
 			ctx.JSON(http.StatusBadRequest, web.NewResponse(400, nil, errorParam))
@@ -193,6 +246,21 @@ func (ph *productHandler) Update() gin.HandlerFunc {
 	}
 }
 
+// Update Product Name and Unit Price
+// @Summary Update product name and unit price
+// @Tags Products
+// @Description update an existing product name and unit price
+// @Accept   json
+// @Produce  json
+// @Param token header string true "Access Token"
+// @Param    id       path      int         true   "ID Product"
+// @Param    product  body      requestDTO  true  "Params to Update"
+// @Success  200    {object}  web.Response  "Success"
+// @Failure  400    {object}  web.Response  "Bad Request"
+// @Failure  401    {object}  web.Response  "Unauthorized"
+// @Failure  404    {object}  web.Response  "Not Found"
+// @Failure  500    {object}  web.Response  "Internal Server Error"
+// @Router /products/{id} [PATCH]
 func (ph *productHandler) UpdatePatch() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
@@ -254,6 +322,19 @@ func (ph *productHandler) UpdatePatch() gin.HandlerFunc {
 	}
 }
 
+// Delete One Product
+// @Summary Delete a product
+// @Tags Products
+// @Description delete an existing product
+// @Produce  json
+// @Param token header string true "Access Token"
+// @Param id	path   int    true "ID Product"
+// @Success  204    "Success"
+// @Failure  400    {object}  web.Response  "Bad Request"
+// @Failure  401    {object}  web.Response  "Unauthorized"
+// @Failure  404    {object}  web.Response  "Not Found"
+// @Failure  500    {object}  web.Response  "Internal Server Error"
+// @Router /products/{id} [DELETE]
 func (ph *productHandler) Delete() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
@@ -289,21 +370,15 @@ func (ph *productHandler) Delete() gin.HandlerFunc {
 			ctx.JSON(http.StatusNotFound, web.NewResponse(404, nil, errDel.Error()))
 			return
 		}
-
-		ctx.JSON(http.StatusOK, web.NewResponse(200, fmt.Sprintf("El producto %d ha sido eliminado", idProduct), ""))
+		ctx.JSON(http.StatusNoContent, nil)
 	}
 }
 
-func validateRequest(req *requestDTO) (strError string) {
+func validateRequest(req requestDTO) (strError string) {
 
-	validate := validator.New()
-
-	err := validate.Struct(req)
+	err := validator.New().Struct(req)
 
 	if err != nil {
-
-		// var strError string
-
 		for _, verr := range err.(validator.ValidationErrors) {
 
 			tag := verr.ActualTag()
@@ -317,8 +392,6 @@ func validateRequest(req *requestDTO) (strError string) {
 				strError = fmt.Sprintf("El valor del parametro %s debe ser mayor a 0", param)
 				return
 			}
-
-			// errors = append(errors, strError)
 		}
 	}
 
