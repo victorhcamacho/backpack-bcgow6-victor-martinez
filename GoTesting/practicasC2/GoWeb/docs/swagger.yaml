@@ -1,0 +1,285 @@
+definitions:
+  handler.requestDTO:
+    properties:
+      cantidadExistencias:
+        minimum: 1
+        type: integer
+      nombre:
+        type: string
+      precioUnitario:
+        minimum: 1
+        type: number
+    required:
+    - cantidadExistencias
+    - nombre
+    - precioUnitario
+    type: object
+  web.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      error:
+        type: string
+    type: object
+info:
+  contact:
+    name: API Support
+    url: https://developers.mercadolibre.com.ar/support
+  description: This API Handle Products.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://developers.mercadolibre.com.ar/es_ar/terminos-y-condiciones
+  title: BootcampGO - Products API
+  version: "1.0"
+paths:
+  /products/:
+    get:
+      description: get all products
+      parameters:
+      - description: Access Token
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: List products
+      tags:
+      - Products
+    post:
+      consumes:
+      - application/json
+      description: create a new product
+      parameters:
+      - description: Access Token
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: Product to Store
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/handler.requestDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: Store a product
+      tags:
+      - Products
+  /products/{id}:
+    delete:
+      description: delete an existing product
+      parameters:
+      - description: Access Token
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: ID Product
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: Delete a product
+      tags:
+      - Products
+    get:
+      description: get only one product
+      parameters:
+      - description: Access Token
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: ID Product
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: List a product
+      tags:
+      - Products
+    patch:
+      consumes:
+      - application/json
+      description: update an existing product name and unit price
+      parameters:
+      - description: Access Token
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: ID Product
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Params to Update
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/handler.requestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: Update product name and unit price
+      tags:
+      - Products
+    put:
+      consumes:
+      - application/json
+      description: update an existing product
+      parameters:
+      - description: Access Token
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: ID Product
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Product to Update
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/handler.requestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: Update a product
+      tags:
+      - Products
+swagger: "2.0"
