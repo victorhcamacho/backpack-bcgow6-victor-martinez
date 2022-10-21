@@ -51,7 +51,9 @@ de los metodos definidos por la interfaz
 func (r *repository) GetLastID() (result int, err error) {
 
 	var products []Product
-	r.db.Read(&products)
+	if err = r.db.Read(&products); err != nil {
+		return
+	}
 
 	result = products[len(products)-1].ID
 
@@ -60,11 +62,9 @@ func (r *repository) GetLastID() (result int, err error) {
 
 func (r *repository) GetAll() (result []Product, err error) {
 
-	r.db.Read(&result)
-
-	/*if len(result) == 0 {
-		result = []Product{}
-	}*/
+	if err = r.db.Read(&result); err != nil {
+		return
+	}
 
 	return
 }
@@ -72,7 +72,9 @@ func (r *repository) GetAll() (result []Product, err error) {
 func (r *repository) GetByID(id int) (result Product, err error) {
 
 	var products []Product
-	r.db.Read(&products)
+	if err = r.db.Read(&products); err != nil {
+		return
+	}
 
 	result, _ = findEntityByID(id, products)
 
@@ -86,7 +88,9 @@ func (r *repository) GetByID(id int) (result Product, err error) {
 func (r *repository) Save(id int, name string, price float64, stock int) (result Product, err error) {
 
 	var products []Product
-	r.db.Read(&products)
+	if err = r.db.Read(&products); err != nil {
+		return
+	}
 
 	result = Product{id, name, price, stock}
 	products = append(products, result)
@@ -101,7 +105,9 @@ func (r *repository) Save(id int, name string, price float64, stock int) (result
 func (r *repository) Update(id int, name string, price float64, stock int) (result Product, err error) {
 
 	var products []Product
-	r.db.Read(&products)
+	if err = r.db.Read(&products); err != nil {
+		return
+	}
 
 	p, i := findEntityByID(id, products)
 
@@ -124,7 +130,9 @@ func (r *repository) Update(id int, name string, price float64, stock int) (resu
 func (r *repository) UpdateNameAndPrice(id int, name string, price float64) (result Product, err error) {
 
 	var products []Product
-	r.db.Read(&products)
+	if err = r.db.Read(&products); err != nil {
+		return
+	}
 
 	p, i := findEntityByID(id, products)
 
@@ -150,7 +158,9 @@ func (r *repository) UpdateNameAndPrice(id int, name string, price float64) (res
 func (r *repository) Delete(id int) (err error) {
 
 	var products []Product
-	r.db.Read(&products)
+	if err = r.db.Read(&products); err != nil {
+		return
+	}
 
 	p, i := findEntityByID(id, products)
 

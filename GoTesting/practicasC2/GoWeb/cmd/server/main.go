@@ -57,5 +57,7 @@ func main() {
 		p.DELETE("/:id", ph.Delete())
 	}
 
-	server.Run(":9000")
+	if err := server.Run(":9000"); err != nil {
+		panic(err)
+	}
 }
