@@ -3,15 +3,9 @@ package products
 import (
 	"fmt"
 
+	"github.com/victorhcamacho/backpack-bcgow6-victor-martinez/GoTesting/practicasC2/GoWeb/internal/domain"
 	"github.com/victorhcamacho/backpack-bcgow6-victor-martinez/GoTesting/practicasC2/GoWeb/pkg/store"
 )
-
-type Product struct {
-	ID            int     `json:"id"`
-	Name          string  `json:"nombre"`
-	UnitPrice     float64 `json:"precioUnitario"`
-	StockQuantity int     `json:"cantidadExistencias"`
-}
 
 /*
 La interfaz sera el punto de acceso a
@@ -20,11 +14,11 @@ todos los metodos disponibles en el repository
 type Repository interface {
 	Delete(id int) error
 	GetLastID() (int, error)
-	GetAll() ([]Product, error)
-	GetByID(id int) (Product, error)
-	Save(id int, name string, price float64, stock int) (Product, error)
-	Update(id int, name string, price float64, stock int) (Product, error)
-	UpdateNameAndPrice(id int, name string, price float64) (Product, error)
+	GetAll() ([]domain.Product, error)
+	GetByID(id int) (domain.Product, error)
+	Save(id int, name string, price float64, stock int) (domain.Product, error)
+	Update(id int, name string, price float64, stock int) (domain.Product, error)
+	UpdateNameAndPrice(id int, name string, price float64) (domain.Product, error)
 }
 
 /*
@@ -50,7 +44,7 @@ de los metodos definidos por la interfaz
 
 func (r *repository) GetLastID() (result int, err error) {
 
-	var products []Product
+	var products []domain.Product
 	if err = r.db.Read(&products); err != nil {
 		return
 	}
@@ -60,18 +54,18 @@ func (r *repository) GetLastID() (result int, err error) {
 	return
 }
 
-func (r *repository) GetAll() (result []Product, err error) {
+func (r *repository) GetAll() ([]domain.Product, error) {
 
-	if err = r.db.Read(&result); err != nil {
-		return
+	var result []domain.Product
+	if err := r.db.Read(&result); err != nil {
+		return nil, err
 	}
-
-	return
+	return result, nil
 }
 
-func (r *repository) GetByID(id int) (result Product, err error) {
+func (r *repository) GetByID(id int) (result domain.Product, err error) {
 
-	var products []Product
+	var products []domain.Product
 	if err = r.db.Read(&products); err != nil {
 		return
 	}
@@ -85,26 +79,26 @@ func (r *repository) GetByID(id int) (result Product, err error) {
 	return
 }
 
-func (r *repository) Save(id int, name string, price float64, stock int) (result Product, err error) {
+func (r *repository) Save(id int, name string, price float64, stock int) (result domain.Product, err error) {
 
-	var products []Product
+	var products []domain.Product
 	if err = r.db.Read(&products); err != nil {
 		return
 	}
 
-	result = Product{id, name, price, stock}
+	result = domain.Product{ID: id, Name: name, UnitPrice: price, StockQuantity: stock}
 	products = append(products, result)
 
 	if err := r.db.Write(products); err != nil {
-		return Product{}, err
+		return domain.Product{}, err
 	}
 
 	return
 }
 
-func (r *repository) Update(id int, name string, price float64, stock int) (result Product, err error) {
+func (r *repository) Update(id int, name string, price float64, stock int) (result domain.Product, err error) {
 
-	var products []Product
+	var products []domain.Product
 	if err = r.db.Read(&products); err != nil {
 		return
 	}
@@ -116,20 +110,20 @@ func (r *repository) Update(id int, name string, price float64, stock int) (resu
 		return
 	}
 
-	result = Product{ID: id, Name: name, UnitPrice: price, StockQuantity: stock}
+	result = domain.Product{ID: id, Name: name, UnitPrice: price, StockQuantity: stock}
 
 	products[i] = result
 
 	if err := r.db.Write(products); err != nil {
-		return Product{}, err
+		return domain.Product{}, err
 	}
 
 	return
 }
 
-func (r *repository) UpdateNameAndPrice(id int, name string, price float64) (result Product, err error) {
+func (r *repository) UpdateNameAndPrice(id int, name string, price float64) (result domain.Product, err error) {
 
-	var products []Product
+	var products []domain.Product
 	if err = r.db.Read(&products); err != nil {
 		return
 	}
@@ -149,7 +143,7 @@ func (r *repository) UpdateNameAndPrice(id int, name string, price float64) (res
 	result = p
 
 	if err := r.db.Write(products); err != nil {
-		return Product{}, err
+		return domain.Product{}, err
 	}
 
 	return
@@ -157,7 +151,7 @@ func (r *repository) UpdateNameAndPrice(id int, name string, price float64) (res
 
 func (r *repository) Delete(id int) (err error) {
 
-	var products []Product
+	var products []domain.Product
 	if err = r.db.Read(&products); err != nil {
 		return
 	}
@@ -177,7 +171,7 @@ func (r *repository) Delete(id int) (err error) {
 	return
 }
 
-func findEntityByID(id int, products []Product) (p Product, index int) {
+func findEntityByID(id int, products []domain.Product) (p domain.Product, index int) {
 
 	for i, pr := range products {
 		if pr.ID == id {

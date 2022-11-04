@@ -5,18 +5,21 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/victorhcamacho/backpack-bcgow6-victor-martinez/GoTesting/practicasC2/GoWeb/internal/domain"
+	"github.com/victorhcamacho/backpack-bcgow6-victor-martinez/GoTesting/practicasC2/GoWeb/test/mocks"
 )
 
 func TestServiceIntegrationUpdate(t *testing.T) {
 
-	expectedResult := Product{
+	// update successful
+	expectedResult := domain.Product{
 		ID:            1,
 		Name:          "Laptop",
 		UnitPrice:     1000,
 		StockQuantity: 50,
 	}
 
-	initialData := []Product{
+	initialData := []domain.Product{
 		{
 			ID:            1,
 			Name:          "Keyboard",
@@ -25,9 +28,8 @@ func TestServiceIntegrationUpdate(t *testing.T) {
 		},
 	}
 
-	store := MockStore{
-		mockedData:    initialData,
-		readWasCalled: false,
+	store := mocks.MockStore{
+		DataMock: initialData,
 	}
 
 	repo := NewRepository(&store)
@@ -37,38 +39,35 @@ func TestServiceIntegrationUpdate(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result, "el resultado es diferente a lo esperado")
-	assert.True(t, store.readWasCalled, "no paso por la funcion read de store")
-}
+	assert.True(t, store.ReadWasCalled, "no paso por la funcion read de store")
 
-func TestServiceIntegrationUpdateFail(t *testing.T) {
-
+	// update failed not found
 	expectedErr := errors.New("no fue posible encontrar el producto con id 5")
 
-	initialData := []Product{
-		{
-			ID:            1,
-			Name:          "Keyboard",
-			UnitPrice:     150,
-			StockQuantity: 5,
-		},
-	}
-
-	store := MockStore{
-		mockedData: initialData,
-	}
-
-	repo := NewRepository(&store)
-	service := NewService(repo)
-
-	result, err := service.Update(5, "Laptop", 1000, 50)
+	result, err = service.Update(5, "Laptop", 1000, 50)
 
 	assert.Empty(t, result)
 	assert.EqualError(t, err, expectedErr.Error())
+
+	// update failed write function
+	expectedErr = errors.New("unexpected fail at write file function")
+
+	store.ErrOnWrite = errors.New("unexpected fail at write file function")
+
+	repo = NewRepository(&store)
+	service = NewService(repo)
+
+	result, err = service.Update(1, "Laptop", 1000, 50)
+
+	assert.Empty(t, result)
+	assert.NotNil(t, err)
+	assert.EqualError(t, expectedErr, err.Error(), "los errores no coinciden")
 }
 
 func TestServiceIntegrationDelete(t *testing.T) {
 
-	expectedResult := []Product{
+	// delete successful
+	expectedResult := []domain.Product{
 		{
 			ID:            2,
 			Name:          "Laptop",
@@ -77,7 +76,7 @@ func TestServiceIntegrationDelete(t *testing.T) {
 		},
 	}
 
-	initialData := []Product{
+	initialData := []domain.Product{
 		{
 			ID:            1,
 			Name:          "Keyboard",
@@ -92,8 +91,8 @@ func TestServiceIntegrationDelete(t *testing.T) {
 		},
 	}
 
-	store := MockStore{
-		mockedData: initialData,
+	store := mocks.MockStore{
+		DataMock: initialData,
 	}
 
 	repo := NewRepository(&store)
@@ -102,31 +101,26 @@ func TestServiceIntegrationDelete(t *testing.T) {
 	err := service.Delete(1)
 
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResult, store.mockedData, "el resultado es diferente a lo esperado")
-}
+	assert.Equal(t, expectedResult, store.DataMock, "el resultado es diferente a lo esperado")
 
-func TestServiceIntegrationDeleteFail(t *testing.T) {
-
+	// delete failed not found
 	expectedErr := errors.New("no fue posible encontrar el producto con id 5")
 
-	initialData := []Product{
-		{
-			ID:            1,
-			Name:          "Keyboard",
-			UnitPrice:     150,
-			StockQuantity: 5,
-		},
-	}
-
-	store := MockStore{
-		mockedData: initialData,
-	}
-
-	repo := NewRepository(&store)
-	service := NewService(repo)
-
-	err := service.Delete(5)
+	err = service.Delete(5)
 
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, expectedErr.Error())
+
+	// update failed write function
+	expectedErr = errors.New("unexpected fail at write file function")
+
+	store.ErrOnWrite = errors.New("unexpected fail at write file function")
+
+	repo = NewRepository(&store)
+	service = NewService(repo)
+
+	err = service.Delete(1)
+
+	assert.NotNil(t, err)
+	assert.EqualError(t, expectedErr, err.Error(), "los errores no coinciden")
 }
